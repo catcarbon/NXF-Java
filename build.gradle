@@ -1,5 +1,6 @@
 plugins {
     id "com.google.protobuf" version "0.8.18"
+    id 'maven-publish'
     id 'java'
 }
 
@@ -7,6 +8,10 @@ group 'io.wtmsb'
 version '1.0-SNAPSHOT'
 
 repositories {
+    mavenLocal()
+    maven {
+        url "https://jitpack.io"
+    }
     mavenCentral()
 }
 

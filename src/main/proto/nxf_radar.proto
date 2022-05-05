@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package nxf;
+package io.wtmsb.nxf;
 
 /**
   Top level message used to draw objects on the scope.

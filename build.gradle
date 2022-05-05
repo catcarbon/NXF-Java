@@ -3,7 +3,7 @@ plugins {
     id 'java'
 }
 
-group 'io.wtmsb.nxf'
+group 'io.wtmsb'
 version '1.0-SNAPSHOT'
 
 repositories {

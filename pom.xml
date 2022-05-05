@@ -11,18 +11,19 @@
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
+        <protobufVersion>3.20.1</protobufVersion>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
-            <version>3.20.1</version>
+            <version>${protobufVersion}</version>
         </dependency>
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java-util</artifactId>
-            <version>3.20.1</version>
+            <version>${protobufVersion}</version>
         </dependency>
     </dependencies>
     <build>
@@ -39,6 +40,11 @@
                 <artifactId>protobuf-maven-plugin</artifactId>
                 <version>0.6.1</version>
                 <extensions>true</extensions>
+                <configuration>
+                    <protocArtifact>
+                        com.google.protobuf:protoc:${protobufVersion}:exe:${os.detected.classifier}
+                    </protocArtifact>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
@@ -47,12 +53,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <additionalProtoPathElements>
-                        <!--additionalProtoPathElement>${project.basedir}/src/main/resources/proto</additionalProtoPathElement-->
-                    </additionalProtoPathElements>
-                    <protocArtifact>com.google.protobuf:protoc:3.20.1:exe:${os.detected.classifier}</protocArtifact>
-                </configuration>
             </plugin>
         </plugins>
     </build>

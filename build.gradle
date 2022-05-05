@@ -3,7 +3,7 @@ plugins {
     id 'java'
 }
 
-group 'nxf-group'
+group 'io.wtmsb.nxf'
 version '1.0-SNAPSHOT'
 
 repositories {
@@ -12,6 +12,19 @@ repositories {
 
 protobuf {
     generatedFilesBaseDir = "$projectDir/src"
+}
+
+sourceSets {
+    main {
+        proto {
+            srcDir 'src/main/resources/proto'
+        }
+    }
+    test {
+        proto {
+            srcDir 'src/test/resources/proto'
+        }
+    }
 }
 
 dependencies {

@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'io.wtmsb'
-version '1.0-SNAPSHOT'
+version '1.0-dev-SNAPSHOT'
 
 repositories {
     mavenLocal()
@@ -13,6 +13,14 @@ repositories {
         url "https://jitpack.io"
     }
     mavenCentral()
+}
+
+publishing {
+    publications {
+        publishToMavenLocal(MavenPublication) {
+            from components.java
+        }
+    }
 }
 
 protobuf {

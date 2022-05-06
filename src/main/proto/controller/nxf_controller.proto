@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-import "nxf_base.proto";
-
 package io.wtmsb.nxf.controller;
 
 enum EventType {
@@ -28,7 +26,6 @@ message Workstation {
 message LogOn {
   controller.Workstation combined_workstation = 1;
   string real_name = 2;
-  nxf.ClientType client_type = 3;
 }
 
 message ModifyWorkstation {

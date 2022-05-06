@@ -17,7 +17,10 @@ repositories {
 
 publishing {
     publications {
-        publishToMavenLocal(MavenPublication) {
+        NXF(MavenPublication) {
+            groupId = "io.wtmsb"
+            artifactId = "NXF-Java"
+            version = "1.0-dev-SNAPSHOT"
             from components.java
         }
     }

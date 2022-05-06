@@ -1,13 +1,37 @@
 syntax = "proto3";
 
+import "google/protobuf/any.proto";
 import "radar/nxf_radar.proto";
 
 package io.wtmsb.nxf.radar;
 
 message ClientRadarEvent {
-  radar.ClientEventType event_type = 1;
   oneof event_specific {
-    radar.Track track = 2;
-    radar.FlightStrip flight_strip = 3;
+    // Nested message edits
+    // Track
+    EditFlightStrip edit_flight_strip = 11;
+    EditInitiateHandoff edit_initiate_handoff = 12;
+    EditAcceptHandoff edit_accept_handoff = 13;
+    EditDataBlockSupplement edit_data_block_supplement = 14;
   }
+}
+
+message EditFlightStrip {
+  uint32 track_id = 1;
+  FlightStrip new_flight_strip = 2;
+}
+
+message EditInitiateHandoff {
+  uint32 track_id = 1;
+  Track.ControllingUnit next_controller = 2;
+}
+
+message EditAcceptHandoff {
+  uint32 track_id = 1;
+  optional Track.ControllingUnit current_controller = 2;
+}
+
+message EditDataBlockSupplement {
+  uint32 track_id = 1;
+  Track.DataBlockSupplement data_block_supplement = 2;
 }

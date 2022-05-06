@@ -1,14 +1,33 @@
 syntax = "proto3";
 
 import "google/protobuf/any.proto";
+import "controller/nxf_controller_client.proto";
+import "controller/nxf_controller_server.proto";
+import "radar/nxf_radar_client.proto";
+import "radar/nxf_radar_server.proto";
 
 package io.wtmsb.nxf;
 
-message NxfWrapper {
+message NxfHeader {
   uint32 version = 1;
   ClientType client_type = 2;
   uint64 timestamp = 3;
-  google.protobuf.Any enclosed_message = 4;
+}
+
+message NxfClientWrapper {
+  NxfHeader header = 1;
+  oneof enclosed_message {
+    controller.ClientControllerEvent controller_event = 2;
+    radar.ClientRadarEvent radar_event = 3;
+  }
+}
+
+message NxfServerWrapper {
+  NxfHeader header = 1;
+  oneof enclosed_message {
+    controller.ClientControllerEvent controller_event = 2;
+    radar.ServerRadarEvent radar_event = 3;
+  }
 }
 
 enum ClientType {

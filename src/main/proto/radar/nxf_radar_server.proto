@@ -1,20 +1,48 @@
 syntax = "proto3";
 
+import "google/protobuf/any.proto";
 import "radar/nxf_radar.proto";
 
 package io.wtmsb.nxf.radar;
 
 message ServerRadarEvent {
-  radar.ServerEventType event_type = 1;
   oneof event_specific {
-    PushRadarTarget radar_target = 2;
-    radar.Track track = 3;
-    radar.FlightStrip flight_strip = 4;
+    // New message pushes
+    Track push_new_track = 1;
+    FlightStrip push_new_flight_strip = 2;
+
+    // Nested message pushes
+    // Track
+    PushRadarTarget push_radar_target = 11;
+    PushFlightStrip push_flight_strip = 12;
+    PushInitiateHandoff push_initiate_handoff = 13;
+    PushAcceptHandoff push_accept_handoff = 14;
+    PushDataBlockSupplement push_data_block_supplement = 15;
   }
 }
 
 message PushRadarTarget {
   uint32 track_id = 1;
-  radar.Track.RadarTarget new_target = 2;
+  Track.RadarTarget new_target = 2;
 }
 
+message PushFlightStrip {
+  uint32 track_id = 1;
+  FlightStrip flight_strip = 2;
+}
+
+message PushInitiateHandoff {
+  uint32 track_id = 1;
+  Track.ControllingUnit next_controller = 2;
+  optional Track.ControllingUnit current_controller = 3;
+}
+
+message PushAcceptHandoff {
+  uint32 track_id = 1;
+  optional Track.ControllingUnit current_controller = 2;
+}
+
+message PushDataBlockSupplement {
+  uint32 track_id = 1;
+  Track.DataBlockSupplement data_block_supplement = 2;
+}

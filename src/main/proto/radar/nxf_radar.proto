@@ -2,17 +2,6 @@ syntax = "proto3";
 
 package io.wtmsb.nxf.radar;
 
-enum ServerEventType {
-  PUSH_RADAR_TARGET = 0;
-  PUSH_TRACK = 1;
-  PUSH_FLIGHT_STRIP = 2;
-}
-
-enum ClientEventType {
-  EDIT_TRACK = 0;
-  EDIT_FLIGHT_STRIP = 1;
-}
-
 /**
   Top level message used to draw objects on the scope.
   Includes radar return and minimum information necessary to construct a data block.
@@ -51,26 +40,29 @@ message Track {
 
   reserved 6 to 10;
 
-  // lld has a default type so it won't be empty
-  enum LeaderLineDirection {
-    DEFAULT = 0;
-    NW = 1;
-    N = 2;
-    NE = 3;
-    W = 4;
-    HIDE = 5;
-    E = 6;
-    SW = 7;
-    S = 8;
-    SE = 9;
-  }
-  LeaderLineDirection leader_line_direction = 11;
+  message DataBlockSupplement {
+    // lld has a default type so it won't be empty
+    enum LeaderLineDirection {
+      DEFAULT = 0;
+      NW = 1;
+      N = 2;
+      NE = 3;
+      W = 4;
+      HIDE = 5;
+      E = 6;
+      SW = 7;
+      S = 8;
+      SE = 9;
+    }
+    LeaderLineDirection leader_line_direction = 1;
 
-  optional uint32 assigned_temporary_altitude = 12;
-  optional string pad_1 = 13;
-  optional string pad_2 = 14;
-  optional string runway = 15;
-  optional string exit_fix = 16;
+    optional uint32 assigned_temporary_altitude = 2;
+    optional string pad_1 = 3;
+    optional string pad_2 = 4;
+    optional string runway = 5;
+    optional string exit_fix = 6;
+  }
+  DataBlockSupplement data_block_supplement = 11;
 }
 
 /**

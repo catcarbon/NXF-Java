@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+import "nxf_base.proto";
+
+package io.wtmsb.nxf.controller;
+
+enum EventType {
+  LOG_ON = 0;
+  LOG_OFF = 1;  // no event_specific
+  MODIFY_WORKSTATION = 2;
+  PING = 10;  // no event_specific
+  PONG = 11;  // no event_specific
+}
+
+enum ModifyWorkstationAction {
+  ACQUIRE = 0;
+  RELEASE = 1;
+}
+
+message Workstation {
+  string callsign = 1;
+  string frequency = 2;
+}
+
+/**
+  Event specific messages
+ */
+message LogOn {
+  controller.Workstation combined_workstation = 1;
+  string real_name = 2;
+  nxf.ClientType client_type = 3;
+}
+
+message ModifyWorkstation {
+  controller.ModifyWorkstationAction action = 1;
+  repeated controller.Workstation workstations = 2;
+}

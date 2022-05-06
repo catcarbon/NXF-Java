@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+import "radar/nxf_radar.proto";
+
+package io.wtmsb.nxf.radar;
+
+message ServerRadarEvent {
+  radar.ServerEventType event_type = 1;
+  oneof event_specific {
+    PushRadarTarget radar_target = 2;
+    radar.Track track = 3;
+    radar.FlightStrip flight_strip = 4;
+  }
+}
+
+message PushRadarTarget {
+  uint32 track_id = 1;
+  radar.Track.RadarTarget new_target = 2;
+}
+

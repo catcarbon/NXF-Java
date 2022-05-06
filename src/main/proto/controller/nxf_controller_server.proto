@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+import "google/protobuf/any.proto";
+import "controller/nxf_controller.proto";
+
+package io.wtmsb.nxf.controller.server;
+
+message ServerControllerEvent {
+  controller.EventType event_type = 1;
+  optional google.protobuf.Any event_specific = 2;
+}
+
+

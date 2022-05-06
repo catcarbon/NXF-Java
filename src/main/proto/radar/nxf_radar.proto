@@ -1,6 +1,17 @@
 syntax = "proto3";
 
-package io.wtmsb.nxf;
+package io.wtmsb.nxf.radar;
+
+enum ServerEventType {
+  PUSH_RADAR_TARGET = 0;
+  PUSH_TRACK = 1;
+  PUSH_FLIGHT_STRIP = 2;
+}
+
+enum ClientEventType {
+  EDIT_TRACK = 0;
+  EDIT_FLIGHT_STRIP = 1;
+}
 
 /**
   Top level message used to draw objects on the scope.
@@ -14,10 +25,10 @@ message Track {
     string lat = 1;
     string lon = 2;
     enum TransponderMode {
-      NoMode = 0;
-      ModeA = 1;
-      ModeC = 2;
-      ModeS = 3;
+      NO_MODE = 0;
+      MODE_A = 1;
+      MODE_C = 2;
+      MODE_S = 3;
     }
     TransponderMode transponder_mode = 3;
     bytes beacon_code = 4;
@@ -72,21 +83,21 @@ message FlightStrip {
   optional bytes aircraft_address = 4;  // Mode S only
 
   enum WakeCategory {
-    NoWeight = 0;
-    CatA = 1;
-    CatB = 2;
-    CatC = 3;
-    CatD = 4;
-    CatE = 5;
-    CatF = 6;
+    NO_WEIGHT = 0;
+    CAT_A = 1;
+    CAT_B = 2;
+    CAT_C = 3;
+    CAT_D = 4;
+    CAT_E = 5;
+    CAT_F = 6;
   }
   WakeCategory wake_category = 5;
 
   enum FlightRule {
-    Instrument = 0;
-    Visual = 1;
-    SpecialVisual = 2;
-    DefenseVisual = 3;
+    INSTRUMENT = 0;
+    VISUAL = 1;
+    SPECIAL_VISUAL = 2;
+    DEFENSE_VISUAL = 3;
   }
   FlightRule flight_rule = 6;
 
@@ -94,17 +105,4 @@ message FlightStrip {
   uint32 requested_altitude = 8;
   bytes assigned_beacon_code = 9;
   optional string route_string = 10;
-}
-
-/**
-  Message to update stored messages on client.
- */
-message RadarUpdateMessage {
-  oneof updated_content {
-    Track.RadarTarget radar_target = 1;  // supply new radar target to a track
-    Track track = 2;
-    FlightStrip flight_strip = 3;
-  }
-
-  uint32 updated_message_id = 4;  // if new radar target is supplied, find track by id
 }

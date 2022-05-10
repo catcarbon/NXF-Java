@@ -27,7 +27,7 @@ message Track {
     optional uint32 reported_altitude = 8;  // Needs at least Mode C
     optional bytes mode_s_address = 9;  // Mode S only
   }
-  repeated RadarTarget radar_target = 2;  // client: store history dots, derive ground speed and heading
+  repeated RadarTarget radar_targets = 2;  // client: store history dots, derive ground speed and heading
 
   optional FlightStrip flight_strip = 3;
 

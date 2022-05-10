@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+import "google/protobuf/any.proto";
+import "nxf_base.proto";
+
+package io.wtmsb.nxf.navigation;
+
+message Airport {
+  string designator = 1;
+  GeoPoint reference_point = 2;
+  reserved 3 to 10;
+
+  repeated google.protobuf.Any runways = 11;
+}
+
+message NavPoint {
+  string designator = 1;
+  oneof associated_point {
+    NavAid nav_aid = 2;
+    NavFix nav_fix = 3;
+    google.protobuf.Any nav_any = 4;
+  }
+}
+
+message NavAid {
+
+}
+
+message NavFix {
+
+}
+
+message Route {
+  string designator = 1;
+
+  message RouteSegment {
+    uint32 segment_number = 1;
+    NavPoint nav_point = 2;
+    uint32 distance_to_next_route_segment = 3;
+  }
+
+  repeated RouteSegment route_segments = 2;
+}

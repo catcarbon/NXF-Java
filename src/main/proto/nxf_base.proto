@@ -25,7 +25,7 @@ message NxfClientWrapper {
 message NxfServerWrapper {
   NxfHeader header = 1;
   oneof enclosed_message {
-    controller.ClientControllerEvent controller_event = 2;
+    controller.ServerControllerEvent controller_event = 2;
     radar.ServerRadarEvent radar_event = 3;
   }
 }

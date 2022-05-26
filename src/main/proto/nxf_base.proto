@@ -6,7 +6,7 @@ import "controller/nxf_controller_server.proto";
 import "radar/nxf_radar_client.proto";
 import "radar/nxf_radar_server.proto";
 
-package io.wtmsb.nxf;
+package io.wtmsb.nxf.message;
 
 message NxfHeader {
   uint32 version = 1;

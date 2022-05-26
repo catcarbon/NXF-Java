@@ -1,11 +1,17 @@
 plugins {
     id "com.google.protobuf" version "0.8.18"
+    id "io.freefair.lombok" version "6.4.3"
     id 'maven-publish'
     id 'java'
 }
 
 group 'io.wtmsb'
 version '1.0-dev-SNAPSHOT'
+
+java {
+    sourceCompatibility = "11"
+    targetCompatibility = "11"
+}
 
 repositories {
     mavenLocal()
@@ -27,7 +33,7 @@ publishing {
 }
 
 protobuf {
-    generatedFilesBaseDir = "$projectDir/target/generated-sources/protobuf"
+    generatedFilesBaseDir = "$projectDir/target/generated-sources"
     protoc {
         artifact = 'com.google.protobuf:protoc:3.20.1'
     }
@@ -35,13 +41,13 @@ protobuf {
 
 sourceSets {
     main {
-        proto {
-            srcDir 'src/main/resources/proto'
+        java {
+            srcDirs = ["target/generated-sources/main/java", "src/main/java"]
         }
     }
     test {
-        proto {
-            srcDir 'src/test/resources/proto'
+        java {
+            srcDirs = ["target/generated-sources/test/java", "src/test/java"]
         }
     }
 }
@@ -49,7 +55,6 @@ sourceSets {
 dependencies {
     implementation 'com.google.protobuf:protobuf-java:3.20.1'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-    //testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
 }
 
 test {

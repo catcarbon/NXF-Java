@@ -3,7 +3,7 @@ syntax = "proto3";
 import "google/protobuf/any.proto";
 import "nxf_base.proto";
 
-package io.wtmsb.nxf.navigation;
+package io.wtmsb.nxf.message.navigation;
 
 message Airport {
   string designator = 1;

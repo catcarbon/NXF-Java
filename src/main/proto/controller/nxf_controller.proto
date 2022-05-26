@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package io.wtmsb.nxf.controller;
+package io.wtmsb.nxf.message.controller;
 
 enum EventType {
   LOG_ON = 0;

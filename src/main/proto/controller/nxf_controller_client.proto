@@ -3,7 +3,7 @@ syntax = "proto3";
 import "google/protobuf/any.proto";
 import "controller/nxf_controller.proto";
 
-package io.wtmsb.nxf.controller;
+package io.wtmsb.nxf.message.controller;
 
 message ClientControllerEvent {
   controller.EventType event_type = 1;

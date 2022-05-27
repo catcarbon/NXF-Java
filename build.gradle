@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'io.wtmsb'
-version '1.0-test-release'
+version '1.0-dev-SNAPSHOT'
 
 java {
     sourceCompatibility = JavaVersion.VERSION_11

@@ -1,21 +1,23 @@
 package io.wtmsb.nxf.object;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
+import io.wtmsb.nxf.message.radar.NxfRadar;
+import lombok.*;
 
-@Getter
-@Setter
-@Builder(toBuilder = true)
+@Getter @Setter @NoArgsConstructor
+@EqualsAndHashCode
 public final class ControllingUnit {
-	@NonNull @Builder.Default
-	String facility = "";
+	@NonNull
+	String facility = "NoFacility";
 
-	@NonNull @Builder.Default
+	@NonNull
 	String sector = "";
 
-	public static ControllingUnit getDefault() {
-		return ControllingUnit.builder().build();
+	public ControllingUnit(NxfRadar.Track.ControllingUnit controllingUnitMessage) {
+		this.setFacility(controllingUnitMessage.getFacility());
+		this.setSector(controllingUnitMessage.getSector());
+	}
+
+	public boolean isDefault() {
+		return facility.equals("NoFacility");
 	}
 }

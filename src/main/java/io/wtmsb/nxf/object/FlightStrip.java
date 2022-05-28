@@ -1,52 +1,56 @@
 package io.wtmsb.nxf.object;
 
+import com.google.protobuf.ByteString;
+import io.wtmsb.nxf.message.radar.NxfRadar;
 import lombok.*;
 
-import java.nio.ByteBuffer;
-
-@Getter
-@Setter
-@Builder(toBuilder = true)
-public class FlightStrip {
+@Getter @Setter @NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+public class FlightStrip implements IRadarComponent {
 	@NonNull
-	private Integer id;
+	private Integer id = Integer.MIN_VALUE;
 
-	@NonNull @Builder.Default
+	@NonNull
 	private String aircraftType = "";
 
-	@NonNull @Builder.Default
+	@NonNull @EqualsAndHashCode.Include
 	private String aircraftCallsign = "";
 
-	@NonNull @Builder.Default
-	private ByteBuffer aircraftAddress = ByteBuffer.allocate(3);
+	@NonNull @EqualsAndHashCode.Include
+	private ByteString aircraftAddress = DEFAULT_AIRCRAFT_ADDRESS;
 
-	public enum WakeCategory {
-		NO_WEIGHT, CAT_A, CAT_B, CAT_C, CAT_D, CAT_E, CAT_F
-	}
-
-	@NonNull @Builder.Default
+	@NonNull
 	private WakeCategory wakeCategory = WakeCategory.NO_WEIGHT;
 
-	public enum FlightRule {
-		INSTRUMENT, VISUAL, SPECIAL_VISUAL, DEFENSE_VISUAL
-	}
-
-	@NonNull @Builder.Default
+	@NonNull
 	private FlightRule flightRule = FlightRule.INSTRUMENT;
 
-	@NonNull @Builder.Default
+	@NonNull
 	private String destination = "";
 
 	@NonNull
-	private Integer requestedAltitude;
+	private Integer requestedAltitude = 0;
 
-	@NonNull @Builder.Default
-	private ByteBuffer assignedBeaconCode = ByteBuffer.allocate(2);
+	@NonNull
+	private ByteString assignedBeaconCode = DEFAULT_BEACON_CODE;
 
-	@NonNull @Builder.Default
+	@NonNull
 	private String routeString = "";
 
-	public static FlightStrip getDefault() {
-		return FlightStrip.builder().build();
+	public FlightStrip(NxfRadar.FlightStrip fsMsg) {
+		id = fsMsg.getId();
+		aircraftType = fsMsg.getAircraftType();
+		aircraftCallsign = fsMsg.getAircraftCallsign();
+		aircraftAddress = IRadarComponent.getAircraftAddressOrDefault(fsMsg.getAircraftAddress());
+		wakeCategory = IRadarComponent.getWakeCategoryOrDefault(fsMsg.getWakeCategoryValue());
+		flightRule = IRadarComponent.getFlightRuleOrDefault(fsMsg.getFlightRuleValue());
+		destination = fsMsg.getDestination();
+		requestedAltitude = fsMsg.getRequestedAltitude();
+		assignedBeaconCode = IRadarComponent.getBeaconCodeOrDefault(fsMsg.getAssignedBeaconCode());
+		routeString = fsMsg.getRouteString();
+	}
+
+	public boolean isDefault() {
+		return id == Integer.MIN_VALUE;
 	}
 }

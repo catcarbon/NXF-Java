@@ -1,34 +1,44 @@
 package io.wtmsb.nxf.object;
 
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
+import com.google.protobuf.ByteString;
+import io.wtmsb.nxf.message.radar.NxfRadar;
+import lombok.*;
 
-import java.nio.ByteBuffer;
+@Getter @Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
+public final class RadarTarget implements IRadarComponent {
+	@NonNull
+	String lat;
+	@NonNull
+	String lon;
 
-@Getter
-@Setter
-public final class RadarTarget {
-	@NonNull String lat;
-	@NonNull String lon;
+	@NonNull @EqualsAndHashCode.Include
+	TransponderMode transponderMode = TransponderMode.NO_MODE;
 
-	enum TransponderMode {
-		NO_MODE, MODE_A, MODE_C, MODE_S
+	@NonNull @EqualsAndHashCode.Include
+	ByteString beaconCode = DEFAULT_BEACON_CODE;
+
+	@NonNull @EqualsAndHashCode.Include @ToString.Include
+	Long returnTime;
+
+	@NonNull
+	Integer reportedAltitude;
+
+	@NonNull @EqualsAndHashCode.Include
+	ByteString modeSAddress = DEFAULT_AIRCRAFT_ADDRESS;
+
+	public RadarTarget(long returnTime) {
+		this.returnTime = returnTime;
 	}
 
-	@NonNull TransponderMode transponderMode;
-	@NonNull ByteBuffer beaconCode;
-	@NonNull Long returnTime;
-	@NonNull Integer reportedAltitude;
-	@NonNull ByteBuffer modeSAddress;
-
-	public RadarTarget() {
-		lat = "";
-		lon = "";
-		transponderMode = TransponderMode.NO_MODE;
-		beaconCode = ByteBuffer.allocate(2);
-		returnTime = 0L;
-		reportedAltitude = 0;
-		modeSAddress = ByteBuffer.allocate(3);
+	public RadarTarget(NxfRadar.Track.RadarTarget rtMsg) {
+		lat = rtMsg.getLat();
+		lon = rtMsg.getLon();
+		transponderMode = IRadarComponent.getTransponderModeOrDefault(rtMsg.getTransponderModeValue());
+		beaconCode = IRadarComponent.getBeaconCodeOrDefault(rtMsg.getBeaconCode());
+		returnTime = rtMsg.getReturnTime();
+		reportedAltitude = rtMsg.getReportedAltitude();
+		modeSAddress = IRadarComponent.getAircraftAddressOrDefault(rtMsg.getModeSAddress());
 	}
 }

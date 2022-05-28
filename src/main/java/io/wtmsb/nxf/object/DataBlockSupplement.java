@@ -1,40 +1,41 @@
 package io.wtmsb.nxf.object;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
+import io.wtmsb.nxf.message.radar.NxfRadar;
+import lombok.*;
 
-@Getter
-@Setter
-@Builder(toBuilder = true)
+import static io.wtmsb.nxf.object.IRadarComponent.LeaderLineDirection;
+import static io.wtmsb.nxf.object.IRadarComponent.getLeaderLineDirectionOrDefault;
+
+@Getter @Setter @NoArgsConstructor @EqualsAndHashCode
 public final class DataBlockSupplement {
-	public enum LeaderLineDirection {
-		DEFAULT,
-		NW, N, NE, W,
-		HIDE,
-		E, SW, S, SE
-	}
-
-	@NonNull @Builder.Default
+	@NonNull
 	LeaderLineDirection leaderLineDirection = LeaderLineDirection.DEFAULT;
 
 	@NonNull
-	Integer assignedTemporaryAltitude;
+	Integer assignedTemporaryAltitude = 0;
 
-	@NonNull @Builder.Default
+	@NonNull
 	String pad1 = "";
 
-	@NonNull @Builder.Default
+	@NonNull
 	String pad2 = "";
 
-	@NonNull @Builder.Default
+	@NonNull
 	String runway = "";
 
-	@NonNull @Builder.Default
+	@NonNull
 	String exitFix = "";
 
-	public static DataBlockSupplement getDefault() {
-		return DataBlockSupplement.builder().build();
+	public DataBlockSupplement(NxfRadar.Track.DataBlockSupplement dsbMsg) {
+		leaderLineDirection = getLeaderLineDirectionOrDefault(dsbMsg.getLeaderLineDirectionValue());
+		assignedTemporaryAltitude = dsbMsg.getAssignedTemporaryAltitude();
+		pad1 = dsbMsg.getPad1();
+		pad2 = dsbMsg.getPad2();
+		runway = dsbMsg.getRunway();
+		exitFix = dsbMsg.getExitFix();
+	}
+
+	public boolean isDefault() {
+		return leaderLineDirection == LeaderLineDirection.DEFAULT;
 	}
 }

@@ -1,30 +1,45 @@
 package io.wtmsb.nxf.object;
 
+import io.wtmsb.nxf.message.radar.NxfRadar;
 import lombok.*;
 
-import java.util.List;
-import java.util.Vector;
-
-@Getter
-@Setter
-@Builder(toBuilder = true)
+@Getter @Setter @NoArgsConstructor
 public class Track {
 	@NonNull
-	private Integer id;
+	private Integer id = Integer.MIN_VALUE;
 
-	@NonNull @Builder.Default
-	private List<RadarTarget> radarTargets = new Vector<>();
+	@NonNull
+	private FlightStrip flightStrip = new FlightStrip();
 
-	@NonNull @Builder.Default
-	private FlightStrip flightStrip = FlightStrip.getDefault();
+	@NonNull
+	private ControllingUnit currentController = new ControllingUnit();
 
-	@NonNull @Builder.Default
-	private ControllingUnit currentController = ControllingUnit.getDefault();
+	@NonNull
+	private ControllingUnit nextController = new ControllingUnit();
 
-	@NonNull @Builder.Default
-	private ControllingUnit nextController = ControllingUnit.getDefault();
+	@NonNull
+	private DataBlockSupplement dataBlockSupplement = new DataBlockSupplement();
 
-	// reserved 6 to 10
-	@NonNull @Builder.Default
-	private DataBlockSupplement dataBlockSupplement = DataBlockSupplement.getDefault();
+	private boolean isPrimary = true;
+
+	public Track(int id) {
+		this.id = id;
+	}
+
+	public Track(NxfRadar.Track tMsg) {
+			id = tMsg.getId();
+			//radarTargets = new Vector<>();
+			flightStrip = new FlightStrip(tMsg.getFlightStrip());
+			currentController = new ControllingUnit(tMsg.getCurrentController());
+			nextController = new ControllingUnit(tMsg.getNextController());
+			dataBlockSupplement = new DataBlockSupplement(tMsg.getDataBlockSupplement());
+	}
+
+	public boolean isPrimaryTrack() {
+		return isPrimary;
+	}
+
+	public boolean isUncorrelatedTrack() {
+		return flightStrip.isDefault();
+	}
 }

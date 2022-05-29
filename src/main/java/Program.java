@@ -1,13 +1,9 @@
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimaps;
-import io.wtmsb.nxf.message.radar.NxfRadar;
-import io.wtmsb.nxf.object.DataBlockSupplement;
-import io.wtmsb.nxf.object.RadarTarget;
-import io.wtmsb.nxf.object.Track;
+import io.wtmsb.nxf.domain.RadarTarget;
+import io.wtmsb.nxf.domain.Track;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 public class Program {
 	public static void main(String[] args) {
@@ -15,8 +11,8 @@ public class Program {
 		LinkedListMultimap<Track, RadarTarget> reverseMap =
 				Multimaps.invertFrom(Multimaps.forMap(forwardMap), LinkedListMultimap.create());
 
-		Track t1 = new Track(1);
-		Track t2 = new Track(2);
+		Track t1 = new Track("N1");
+		Track t2 = new Track("N2");
 		assert !t1.equals(t2);
 
 		for (int i = 0; i < 10; i++){
@@ -33,7 +29,16 @@ public class Program {
 			}
 		}
 
-		forwardMap.forEach((key, value) -> System.out.println(key + ": " + value));
-		reverseMap.asMap().forEach((key, value) -> System.out.println(key + ": " + value));
+		forwardMap.forEach((key, value) ->
+				System.out.println(key.getReturnTime().toEpochMilli()/1000 + ": " + value.getFlightStrip().getAircraftCallsign()));
+
+		reverseMap.asMap().forEach(
+				(key, value) -> {
+					System.out.print(key.getFlightStrip().getAircraftCallsign() + ": ");
+					value.forEach(x -> {
+						System.out.print(x.getReturnTime().toEpochMilli()/1000 + " ");
+					});
+					System.out.println();
+				});
 	}
 }

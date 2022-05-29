@@ -2,49 +2,38 @@ package io.wtmsb.nxf.manager;
 
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Multimaps;
-import com.google.protobuf.ByteString;
-import io.wtmsb.nxf.object.FlightStrip;
-import io.wtmsb.nxf.object.IRadarComponent;
-import io.wtmsb.nxf.object.RadarTarget;
-import io.wtmsb.nxf.object.Track;
+import io.wtmsb.nxf.domain.FlightStrip;
+import io.wtmsb.nxf.domain.IRadarComponent;
+import io.wtmsb.nxf.domain.RadarTarget;
+import io.wtmsb.nxf.domain.Track;
 import io.wtmsb.nxf.utility.GeoCalculator;
 import lombok.Synchronized;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
+@Service
 public class TrackManager {
+	private ControllerManager controllerManager;
 	private final Map<RadarTarget, Track> targetTrackMap;
 	private final ListMultimap<Track, RadarTarget> trackTargetMultiMap;
 
-	private final Map<ByteString, Track> beaconTrackMap;
+	private final int radarReturnCount = 6;
 
-	private final Map<ByteString, Track> addressTrackMap;
+	private final int updateFrequency = 3;
 
-	private final int radarReturnCount;
-
-
-	public TrackManager() {
-		this(6);
+	@Autowired
+	public TrackManager(ControllerManager controllerManager) {
+		this();
+		this.controllerManager = controllerManager;
 	}
 
-	public TrackManager(int customRadarReturnCount) {
+	public TrackManager() {
 		targetTrackMap = new ConcurrentHashMap<>();
-		trackTargetMultiMap = Multimaps.invertFrom(Multimaps.forMap(targetTrackMap),
-				LinkedListMultimap.create());
-
-		beaconTrackMap = new ConcurrentHashMap<>();
-		addressTrackMap = new ConcurrentHashMap<>();
-		radarReturnCount = customRadarReturnCount;
+		trackTargetMultiMap = LinkedListMultimap.create();
 	}
 
 	public void addTarget(RadarTarget target) {
@@ -76,18 +65,13 @@ public class TrackManager {
 				.min(Comparator.comparingDouble(o -> GeoCalculator.calculateDistance(o, newTarget)));
 
 		// generate a new track by default
-		Track associatedTrack = new Track();
+		Track associatedTrack = new Track("PRI");
 
 		if (_closestTarget.isPresent()) {
 			RadarTarget closestTarget = _closestTarget.get();
-			LocalDateTime closestTargetTime =
-					LocalDateTime.ofEpochSecond(closestTarget.getReturnTime(), 0, ZoneOffset.UTC);
-			LocalDateTime newTargetTime =
-					LocalDateTime.ofEpochSecond(newTarget.getReturnTime(), 0, ZoneOffset.UTC);
-
 			// associate the new target with the track associated with the closest target
 			if (GeoCalculator.calculateDistance(closestTarget, newTarget) <= 16.0 &&
-					Duration.between(closestTargetTime, newTargetTime).getSeconds() < 45)
+					Duration.between(closestTarget.getReturnTime(), newTarget.getReturnTime()).getSeconds() < 45)
 			{
 				// get the existing track if track's latest return isn't stale or not within 16 miles of the new target
 				associatedTrack = targetTrackMap.get(closestTarget);
@@ -103,8 +87,11 @@ public class TrackManager {
 		}
 	}
 
+	/**
+	 *
+	 */
 	@Synchronized
 	public void pruneStaleTracks() {
-
+		//trackTargetMultiMap
 	}
 }

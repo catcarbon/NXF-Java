@@ -1,8 +1,7 @@
-package io.wtmsb.nxf.object;
+package io.wtmsb.nxf.domain;
 
 import com.google.protobuf.ByteString;
-
-import java.nio.ByteBuffer;
+import io.wtmsb.nxf.validator.ByteStringSize;
 
 public interface IRadarComponent {
 	int BEACON_CODE_SIZE = 2;
@@ -30,11 +29,7 @@ public interface IRadarComponent {
 	}
 
 	static ByteString getBeaconCodeOrDefault(ByteString src) {
-		return isBeaconCodeLegit(src) ? src : DEFAULT_BEACON_CODE;
-	}
-
-	static ByteString getAircraftAddressOrDefault(ByteString src) {
-		return isAircraftAddressLegit(src) ? src : DEFAULT_AIRCRAFT_ADDRESS;
+		return checkBeaconCodeValue(src) ? src : DEFAULT_BEACON_CODE;
 	}
 
 	static TransponderMode getTransponderModeOrDefault(int ordinal) {
@@ -57,27 +52,16 @@ public interface IRadarComponent {
 				LeaderLineDirection.values()[ordinal] : LeaderLineDirection.DEFAULT;
 	}
 
-	static boolean isBeaconCodeLegit(ByteString octal) {
-		if (octal.size() != BEACON_CODE_SIZE)
-			return false;
-
+	private static boolean checkBeaconCodeValue(ByteString octal) {
 		int value = fromBeaconCodeArray(octal.toByteArray());
 		return 0 <= value && value <= 0xFFF;
 	}
 
-	static boolean isAircraftAddressLegit(ByteString octal) {
-		if (octal.size() != AIRCRAFT_ADDRESS_SIZE)
-			return false;
-
-		int value = fromAircraftAddressArray(octal.toByteArray());
-		return 0 <= value && value <= 0xFFFFFF;
-	}
-
-	static int fromBeaconCodeArray(byte[] bytes) {
+	private static int fromBeaconCodeArray(byte[] bytes) {
 		return ((bytes[0] & 0xFF) << 8) | (bytes[1] & 0xFF);
 	}
 
-	static int fromAircraftAddressArray(byte[] bytes) {
+	private static int fromAircraftAddressArray(byte[] bytes) {
 		return ((bytes[0] & 0xFF) << 16) | ((bytes[1] & 0xFF) << 8) | (bytes[2] & 0xFF);
 	}
 }

@@ -1,4 +1,4 @@
-package io.wtmsb.nxf.validator;
+package io.wtmsb.nxf.validation;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -10,10 +10,9 @@ import static java.lang.annotation.ElementType.*;
 
 @Target({METHOD, FIELD, ANNOTATION_TYPE, PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = ByteStringSizeValidator.class)
-public @interface ByteStringSize {
-	String message() default "{io.wtmsb.nxf.constraint.ByteStringSize.message}";
+@Constraint(validatedBy = BeaconCodeValidator.class)
+public @interface BeaconCode {
+	String message() default "{io.wtmsb.nxf.validation.BeaconCode.message}";
 	Class<?>[] groups() default {};
 	Class<? extends Payload>[] payload() default {};
-	int value();
 }

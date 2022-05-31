@@ -17,7 +17,7 @@ public final class ControllingUnit {
 	@NonNull @Size(max = 5)
 	private final String sector;
 
-	public ControllingUnit(NxfRadar.Track.ControllingUnit cuMessage) {
+	public ControllingUnit(NxfRadar.ControllingUnit cuMessage) {
 		facility = cuMessage.getFacility();
 		sector = cuMessage.getSector();
 	}

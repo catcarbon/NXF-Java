@@ -30,11 +30,11 @@ public class Program {
 		}
 
 		forwardMap.forEach((key, value) ->
-				System.out.println(key.getReturnTime().toEpochMilli()/1000 + ": " + value.getFlightStrip().getAircraftCallsign()));
+				System.out.println(key.getReturnTime().toEpochMilli()/1000 + ": " + value.getFlightData().getCallsign()));
 
 		reverseMap.asMap().forEach(
 				(key, value) -> {
-					System.out.print(key.getFlightStrip().getAircraftCallsign() + ": ");
+					System.out.print(key.getFlightData().getCallsign() + ": ");
 					value.forEach(x -> {
 						System.out.print(x.getReturnTime().toEpochMilli()/1000 + " ");
 					});

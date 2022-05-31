@@ -1,22 +1,14 @@
 package io.wtmsb.nxf.domain;
 
-import io.wtmsb.nxf.manager.ControllerManager;
-import io.wtmsb.nxf.message.radar.NxfRadar;
+import com.google.protobuf.ByteString;
+import io.wtmsb.nxf.validation.BeaconCode;
+import io.wtmsb.nxf.validation.IcaoAddress;
 import lombok.*;
 
 @Getter @Setter
 public class Track {
 	@NonNull
-	private FlightStrip flightStrip;
-
-	@NonNull
-	private ControllingUnit currentController;
-
-	@NonNull
-	private ControllingUnit nextController;
-
-	@NonNull
-	private DataBlockSupplement dataBlockSupplement;
+	private FlightData flightData;
 
 	@Getter(value = AccessLevel.NONE) @Setter(value = AccessLevel.NONE)
 	private boolean isPrimary = true;
@@ -24,44 +16,36 @@ public class Track {
 	@Getter(value = AccessLevel.NONE) @Setter(value = AccessLevel.NONE)
 	private boolean isCorrelated = false;
 
-	public Track(String aircraftCallsign) {
-		flightStrip = new FlightStrip(aircraftCallsign);
-		dataBlockSupplement = new DataBlockSupplement();
-		currentController = nextController = ControllerManager.getDefaultControllingUnit();
+	/**
+	 * Constructor for creating a new primary track
+	 *
+	 * @param callsign callsign for this track
+	 */
+	public Track(String callsign) {
+		flightData = new FlightData(callsign);
 	}
 
-	public Track(NxfRadar.Track tMsg) {
-		flightStrip = new FlightStrip(tMsg.getFlightStrip());
-		dataBlockSupplement = new DataBlockSupplement(tMsg.getDataBlockSupplement());
-		currentController = ControllerManager.getControllingUnit(tMsg.getCurrentController());
-		nextController = ControllerManager.getControllingUnit(tMsg.getNextController());
+	/**
+	 * For creating a new mode A or C track
+	 *
+	 * @param callsign callsign for this track
+	 * @param beaconCode 12-bit octal beacon code enclosed in 2 byte
+	 */
+	public Track(String callsign, @BeaconCode ByteString beaconCode) {
+		flightData = new FlightData(callsign);
+		flightData.setHasAssignedBeaconCode(true);
+		flightData.setAssignedBeaconCode(beaconCode);
 	}
 
-	public boolean isPrimaryTrack() {
-		return isPrimary;
-	}
-
-	public boolean isUncorrelatedTrack() {
-		return isCorrelated;
-	}
-
-	public void correlateFlightStrip(FlightStrip fs) {
-		flightStrip = fs;
-		isCorrelated = true;
-		isPrimary = false;
-	}
-
-	public void detachFlightStrip() {
-		flightStrip.setAircraftCallsign("WHO");
-		isCorrelated = false;
-	}
-
-	public void setPrimary() {
-		isCorrelated = false;
-		isPrimary = true;
-	}
-
-	public boolean isUncontrolledTrack() {
-		return currentController == ControllerManager.getDefaultControllingUnit();
+	/**
+	 * For creating a new mode S track
+	 *
+	 * @param callsign callsign for this track
+	 * @param icaoAddress 3 byte ICAO address associated with this track
+	 */
+	public Track(String callsign, @BeaconCode ByteString beaconCode, @IcaoAddress ByteString icaoAddress) {
+		this(callsign, beaconCode);
+		flightData.setHasIcaoAddress(true);
+		flightData.setIcaoAddress(icaoAddress);
 	}
 }

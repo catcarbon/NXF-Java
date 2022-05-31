@@ -2,51 +2,83 @@ package io.wtmsb.nxf.domain;
 
 import com.google.protobuf.ByteString;
 import io.wtmsb.nxf.message.radar.NxfRadar;
-import io.wtmsb.nxf.validator.ByteStringSize;
+import io.wtmsb.nxf.validation.BeaconCode;
+import io.wtmsb.nxf.validation.IcaoAddress;
 import lombok.*;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.time.Instant;
 
-@Getter @Setter
-@EqualsAndHashCode @ToString
+@Getter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString
 public final class RadarTarget implements IRadarComponent {
-	@NonNull @Min(-90) @Max(90)
-	private Double lat;
-	@NonNull @Min(-180) @Max(180)
-	private Double lon;
+	@Min(-90) @Max(90)
+	private final double lat;
+	@Min(-180) @Max(180)
+	private final double lon;
 
-	@NonNull
-	private TransponderMode transponderMode = TransponderMode.NO_MODE;
+	@NonNull @Min(0)
+	private final Instant returnTime;
 
-	@NonNull @ByteStringSize(BEACON_CODE_SIZE)
-	private ByteString beaconCode = DEFAULT_BEACON_CODE;
+	@BeaconCode
+	private final ByteString beaconCode;
 
-	@NonNull
-	private Instant returnTime = Instant.EPOCH;
+	@Max(MAX_ALTITUDE)
+	private final int reportedAltitude;
 
-	@NonNull @Min(0) @Max(100000)
-	private Integer reportedAltitude;
+	@IcaoAddress
+	private final ByteString modeSAddress;
 
-	@NonNull
-	private ByteString modeSAddress = DEFAULT_AIRCRAFT_ADDRESS;
+	private final IRadarComponent.TransponderMode transponderMode;
+
+	private final int groundSpeed;
+
+	@Max(359)
+	private final int groundTrack;
+
 
 	public RadarTarget(long customReturnTime) {
+		// TODO: for testing only, remove when possible
+		lat = lon = 0.0;
+		beaconCode = DEFAULT_BEACON_CODE;
+		reportedAltitude = 0;
+		modeSAddress = DEFAULT_ICAO_ADDRESS;
+		transponderMode = TransponderMode.PRIMARY;
+		groundSpeed = 0;
+		groundTrack = 0;
 		returnTime = Instant.ofEpochSecond(customReturnTime);
 	}
 
-	public RadarTarget(NxfRadar.Track.RadarTarget rtMsg) throws RuntimeException {
-		lat = Double.parseDouble(rtMsg.getLat());
-		lon = Double.parseDouble(rtMsg.getLon());
-		transponderMode = IRadarComponent.getTransponderModeOrDefault(rtMsg.getTransponderModeValue());
-		beaconCode = IRadarComponent.getBeaconCodeOrDefault(rtMsg.getBeaconCode());
+	public RadarTarget(NxfRadar.RadarTarget rtMsg) {
+		lat = rtMsg.getLat();
+		lon = rtMsg.getLon();
 		returnTime = Instant.ofEpochSecond(rtMsg.getReturnTime());
-		reportedAltitude = rtMsg.getReportedAltitude();
-		modeSAddress = rtMsg.getModeSAddress();
-	}
 
-	public boolean isDefault() {
-		return returnTime == Instant.EPOCH;
+		if (rtMsg.hasModeSAddress() && rtMsg.hasReportedAltitude() && rtMsg.hasBeaconCode()) {
+			transponderMode = TransponderMode.MODE_S;
+			beaconCode = rtMsg.getBeaconCode();
+			reportedAltitude = rtMsg.getReportedAltitude();
+			modeSAddress = rtMsg.getModeSAddress();
+		} else if (rtMsg.hasReportedAltitude() && rtMsg.hasBeaconCode()) {
+			transponderMode = TransponderMode.MODE_C;
+			beaconCode = rtMsg.getBeaconCode();
+			reportedAltitude = rtMsg.getReportedAltitude();
+			modeSAddress = DEFAULT_ICAO_ADDRESS;
+		} else if (rtMsg.hasBeaconCode()) {
+			transponderMode = TransponderMode.MODE_A;
+			beaconCode = rtMsg.getBeaconCode();
+			reportedAltitude = 0;
+			modeSAddress = DEFAULT_ICAO_ADDRESS;
+		} else {
+			transponderMode = TransponderMode.PRIMARY;
+			beaconCode = DEFAULT_BEACON_CODE;
+			reportedAltitude = 0;
+			modeSAddress = DEFAULT_ICAO_ADDRESS;
+		}
+
+		groundSpeed = rtMsg.getGroundSpeed();
+		groundTrack = rtMsg.getGroundTrack();
 	}
 }

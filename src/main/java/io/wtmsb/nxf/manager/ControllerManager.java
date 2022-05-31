@@ -10,11 +10,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 public final class ControllerManager {
-	private static final ControllingUnit defaultControllingUnit = new ControllingUnit("", "");
+	private static final ControllingUnit uncontrolledUnit =
+			new ControllingUnit(NxfRadar.ControllingUnit.getDefaultInstance());
 	private static final Table<String, String, ControllingUnit> cache = HashBasedTable.create();
 
 	static {
-		cache.put("", "", defaultControllingUnit);
+		cache.put(uncontrolledUnit.getFacility(), uncontrolledUnit.getSector(), uncontrolledUnit);
 	}
 
 	@Synchronized
@@ -26,12 +27,12 @@ public final class ControllerManager {
 		return cache.get(facility, sector);
 	}
 
-	public static ControllingUnit getControllingUnit(NxfRadar.Track.@NonNull ControllingUnit nxfCu) {
+	public static ControllingUnit getControllingUnit(NxfRadar.@NonNull ControllingUnit nxfCu) {
 		String facility = nxfCu.getFacility(), sector = nxfCu.getSector();
 		return getControllingUnit(facility, sector);
 	}
 
-	public static ControllingUnit getDefaultControllingUnit() {
-		return defaultControllingUnit;
+	public static ControllingUnit getUncontrolledUnit() {
+		return uncontrolledUnit;
 	}
 }

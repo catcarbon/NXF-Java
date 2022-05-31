@@ -3,87 +3,35 @@ syntax = "proto3";
 package io.wtmsb.nxf.message.radar;
 
 /**
-  Top level message used to draw objects on the scope.
-  Includes radar return and minimum information necessary to construct a data block.
+  NxfRadar.RadarTarget message:
+  This message is analogous to a radar blip.
+  Nxf data source should not attempt to modify an already-sent RadarTarget message.
+  Nxf data client should make the domain object for this message immutable.
  */
-message Track {
-  uint32 id = 1;
-
-  // Radar targets must live inside a track
-  message RadarTarget {
-    string lat = 1;
-    string lon = 2;
-    enum TransponderMode {
-      NO_MODE = 0;
-      MODE_A = 1;
-      MODE_C = 2;
-      MODE_S = 3;
-    }
-    TransponderMode transponder_mode = 3;
-    bytes beacon_code = 4;
-    //uint32 calculated_ground_speed = 5;
-    //uint32 calculated_heading = 6;
-    uint64 return_time = 7;
-    optional uint32 reported_altitude = 8;  // Needs at least Mode C
-    optional bytes mode_s_address = 9;  // Mode S only
-  }
-  repeated RadarTarget radar_targets = 2;  // client: store history dots, derive ground speed and heading
-
-  optional FlightStrip flight_strip = 3;
-
-  message ControllingUnit {
-    string facility = 1;
-    string sector = 2;
-  }
-  optional ControllingUnit current_controller = 4;
-  optional ControllingUnit next_controller = 5;
-
-  reserved 6 to 10;
-
-  message DataBlockSupplement {
-    // lld has a default type so it won't be empty
-    enum LeaderLineDirection {
-      DEFAULT = 0;
-      NW = 1;
-      N = 2;
-      NE = 3;
-      W = 4;
-      HIDE = 5;
-      E = 6;
-      SW = 7;
-      S = 8;
-      SE = 9;
-    }
-    LeaderLineDirection leader_line_direction = 1;
-
-    optional uint32 assigned_temporary_altitude = 2;
-    optional string pad_1 = 3;
-    optional string pad_2 = 4;
-    optional string runway = 5;
-    optional string exit_fix = 6;
-  }
-  DataBlockSupplement data_block_supplement = 11;
+message RadarTarget {
+  double lat = 1;  // mandatory id component
+  double lon = 2;  // mandatory id component
+  uint64 return_time = 3;  // mandatory id component
+  optional bytes beacon_code = 4;  // optional id component but will be used in almost all cases
+  optional uint32 reported_altitude = 5;
+  optional bytes mode_s_address = 6;  // optional id component
+  uint32 ground_speed = 7;
+  uint32 ground_track = 8;
 }
 
 /**
-  Flight strip message that could be used to supplement data block display.
+  NxfRadar.FlightData message:
+  This message is analogous to a flight plan.
  */
-message FlightStrip {
-  uint32 id = 1;
-  string aircraft_type = 2;
-  string aircraft_callsign = 3;
-  optional bytes aircraft_address = 4;  // Mode S only
-
-  enum WakeCategory {
-    NO_WEIGHT = 0;
-    CAT_A = 1;
-    CAT_B = 2;
-    CAT_C = 3;
-    CAT_D = 4;
-    CAT_E = 5;
-    CAT_F = 6;
+message FlightData {
+  message Key {
+    string callsign = 1;  // mandatory key component
+    optional bytes icao_address = 2;  // optional key component
   }
-  WakeCategory wake_category = 5;
+  Key identification = 1;
+  optional bytes assigned_beacon_code = 3;
+  optional string aircraft_type = 4;
+  optional string equipment_suffix = 5;
 
   enum FlightRule {
     INSTRUMENT = 0;
@@ -91,10 +39,45 @@ message FlightStrip {
     SPECIAL_VISUAL = 2;
     DEFENSE_VISUAL = 3;
   }
-  FlightRule flight_rule = 6;
+  optional FlightRule flight_rule = 6;
 
-  string destination = 7;
-  uint32 requested_altitude = 8;
-  bytes assigned_beacon_code = 9;
+  optional string departure_point = 7;
+  optional string destination = 8;
+  optional uint32 requested_altitude = 9;
   optional string route_string = 10;
+
+  reserved 11 to 19;
+
+  //optional uint64 last_updated = 20;
+
+  optional ControllingUnit current_controller = 21;
+  optional ControllingUnit next_controller = 22;
+}
+
+message ControllingUnit {
+  string facility = 1;
+  string sector = 2;
+}
+
+message FlightDataSupplement {
+  optional uint32 assigned_temporary_altitude = 23;
+  optional uint32 assigned_final_altitude = 24;
+  optional string pad_1 = 25;
+  optional string pad_2 = 26;
+  optional string runway = 27;
+  optional string exit_fix = 28;
+
+  enum LeaderLineDirection {
+    DEFAULT = 0;
+    NW = 1;
+    N = 2;
+    NE = 3;
+    W = 4;
+    HIDE = 5;
+    E = 6;
+    SW = 7;
+    S = 8;
+    SE = 9;
+  }
+  optional LeaderLineDirection leader_line_direction = 29;
 }

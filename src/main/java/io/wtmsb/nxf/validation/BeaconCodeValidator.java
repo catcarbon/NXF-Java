@@ -21,9 +21,6 @@ public class BeaconCodeValidator implements ConstraintValidator<BeaconCode, Byte
 
 	@Override
 	public boolean isValid(ByteString bs, ConstraintValidatorContext constraintValidatorContext) {
-		if (bs == null || bs.size() != BEACON_CODE_SIZE)
-			return false;
-
-		return checkBeaconCodeValue(bs);
+		return bs != null && bs.size() == BEACON_CODE_SIZE && checkBeaconCodeValue(bs);
 	}
 }

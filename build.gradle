@@ -60,12 +60,20 @@ dependencies {
     implementation 'com.google.guava:guava:31.1-jre'
     implementation 'org.springframework:spring-core:5.3.20'
     implementation 'org.springframework:spring-context:5.3.20'
+    implementation 'org.hibernate.validator:hibernate-validator:6.2.3.Final'
+    implementation 'org.hibernate.validator:hibernate-validator-cdi:6.2.3.Final'
+    implementation 'org.glassfish:jakarta.el:3.0.3'
     implementation 'jakarta.validation:jakarta.validation-api:2.0.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+
+    testImplementation platform('org.junit:junit-bom:5.8.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
 }
 
 test {
     useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
 }
 
 afterEvaluate {

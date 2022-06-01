@@ -23,7 +23,6 @@ public class Program {
 			var bean = ctx.getBean(Program.class);
 			bean.run();
 		}
-
 	}
 
 	public void run() {

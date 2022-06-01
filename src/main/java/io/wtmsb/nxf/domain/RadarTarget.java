@@ -8,6 +8,7 @@ import lombok.*;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.PastOrPresent;
 import java.time.Instant;
 
 @Getter
@@ -18,7 +19,7 @@ public final class RadarTarget implements IRadarComponent {
 	@Min(-180) @Max(180)
 	private final double lon;
 
-	@NonNull @Min(0)
+	@NonNull @PastOrPresent
 	private final Instant returnTime;
 
 	@BeaconCode
@@ -50,27 +51,41 @@ public final class RadarTarget implements IRadarComponent {
 		returnTime = Instant.ofEpochSecond(customReturnTime);
 	}
 
+	/**
+	 * Create an immutable {@link RadarTarget}. <br/>
+	 *
+	 * Field {@link RadarTarget#transponderMode} is determined by checking if certain fields
+	 * are set in {@link NxfRadar.RadarTarget}
+	 *
+	 * @param rtMsg {@link NxfRadar.RadarTarget} message
+	 */
 	public RadarTarget(NxfRadar.RadarTarget rtMsg) {
 		lat = rtMsg.getLat();
 		lon = rtMsg.getLon();
 		returnTime = Instant.ofEpochSecond(rtMsg.getReturnTime());
 
 		if (rtMsg.hasModeSAddress() && rtMsg.hasReportedAltitude() && rtMsg.hasBeaconCode()) {
+			// must have all three set to be made a mode S target
 			transponderMode = TransponderMode.MODE_S;
 			beaconCode = rtMsg.getBeaconCode();
 			reportedAltitude = rtMsg.getReportedAltitude();
 			modeSAddress = rtMsg.getModeSAddress();
 		} else if (rtMsg.hasReportedAltitude() && rtMsg.hasBeaconCode()) {
+			// must have reported altitude and beacon code set to be made a mode C target
 			transponderMode = TransponderMode.MODE_C;
 			beaconCode = rtMsg.getBeaconCode();
 			reportedAltitude = rtMsg.getReportedAltitude();
 			modeSAddress = DEFAULT_ICAO_ADDRESS;
 		} else if (rtMsg.hasBeaconCode()) {
+			// must have beacon code set to be made a mode A target
 			transponderMode = TransponderMode.MODE_A;
 			beaconCode = rtMsg.getBeaconCode();
 			reportedAltitude = 0;
 			modeSAddress = DEFAULT_ICAO_ADDRESS;
 		} else {
+			// if message has none of the three fields,
+			// or if the fields are set incorrectly (e.g. reported altitude and address are set but beacon code is not)
+			// the target will be made a primary target with all fields set to default
 			transponderMode = TransponderMode.PRIMARY;
 			beaconCode = DEFAULT_BEACON_CODE;
 			reportedAltitude = 0;

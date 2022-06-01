@@ -11,8 +11,7 @@ import javax.validation.constraints.Min;
 import java.time.Instant;
 
 @Getter
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString
+@EqualsAndHashCode @ToString
 public final class RadarTarget implements IRadarComponent {
 	@Min(-90) @Max(90)
 	private final double lat;

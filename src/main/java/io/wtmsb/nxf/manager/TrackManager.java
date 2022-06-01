@@ -8,7 +8,7 @@ import io.wtmsb.nxf.utility.GeoCalculator;
 import lombok.NonNull;
 import lombok.Synchronized;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 import static io.wtmsb.nxf.domain.IRadarComponent.TransponderMode;
 
-@Service
+@Component
 public class TrackManager {
 	private ControllerManager controllerManager;
 	private final Map<RadarTarget, Track> targetTrackMap;
@@ -39,6 +39,21 @@ public class TrackManager {
 	public TrackManager(ControllerManager controllerManager) {
 		this();
 		this.controllerManager = controllerManager;
+	}
+
+	@Synchronized
+	public Map<RadarTarget, Track> getTargetTrackMap() {
+		return targetTrackMap;
+	}
+
+	@Synchronized
+	public ListMultimap<Track, RadarTarget> getTrackRadarTargetMultiMap() {
+		return trackTargetMultiMap;
+	}
+
+	@Synchronized
+	public Map<String, Track> getTrackByCallsignMap() {
+		return trackByCallsignMap;
 	}
 
 	public void addTarget(RadarTarget target, @NonNull String callsign) {
@@ -73,7 +88,7 @@ public class TrackManager {
 	 */
 	@Synchronized
 	private void addCorrelatedTarget(RadarTarget target, String callsignHint) {
-		Track correlatedTrack = trackByCallsignMap.computeIfAbsent(callsignHint, value -> new Track(callsignHint));
+		Track correlatedTrack = trackByCallsignMap.computeIfAbsent(callsignHint, Track::new);
 		trackTargetMultiMap.put(correlatedTrack, target);
 		targetTrackMap.put(target, correlatedTrack);
 		trimHistoryRadarTarget(correlatedTrack);

@@ -7,8 +7,9 @@ import io.wtmsb.nxf.message.radar.NxfRadar;
 import lombok.NonNull;
 import lombok.Synchronized;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 public final class ControllerManager {
 	private static final ControllingUnit uncontrolledUnit =
 			new ControllingUnit(NxfRadar.ControllingUnit.getDefaultInstance());

@@ -1,44 +1,70 @@
-import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.Multimaps;
+import com.google.common.collect.ListMultimap;
+import com.google.protobuf.ByteString;
 import io.wtmsb.nxf.domain.RadarTarget;
 import io.wtmsb.nxf.domain.Track;
+import io.wtmsb.nxf.manager.TrackManager;
+import io.wtmsb.nxf.message.radar.NxfRadar;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.function.BiConsumer;
 
+@Component
+@ComponentScan(basePackages = "io.wtmsb.nxf.manager")
 public class Program {
+	@Autowired
+	private TrackManager manager;
+
 	public static void main(String[] args) {
-		Map<RadarTarget, Track> forwardMap = Collections.synchronizedMap(new LinkedHashMap<>());
-		LinkedListMultimap<Track, RadarTarget> reverseMap =
-				Multimaps.invertFrom(Multimaps.forMap(forwardMap), LinkedListMultimap.create());
-
-		Track t1 = new Track("N1");
-		Track t2 = new Track("N2");
-		assert !t1.equals(t2);
-
-		for (int i = 0; i < 10; i++){
-			RadarTarget rt1 = new RadarTarget(i);
-			RadarTarget rt2 = new RadarTarget(i + 10);
-			forwardMap.put(rt1, t1);
-			reverseMap.put(t1, rt1);
-			forwardMap.put(rt2, t2);
-			reverseMap.put(t2, rt2);
-
-			List<RadarTarget> targetsList = reverseMap.get(t1);
-			while (targetsList.size() > 6) {
-				forwardMap.remove(targetsList.remove(0));
-			}
+		try (GenericApplicationContext ctx = new AnnotationConfigApplicationContext(Program.class)) {
+			var bean = ctx.getBean(Program.class);
+			bean.run();
 		}
 
-		forwardMap.forEach((key, value) ->
-				System.out.println(key.getReturnTime().toEpochMilli()/1000 + ": " + value.getFlightData().getCallsign()));
+	}
 
-		reverseMap.asMap().forEach(
-				(key, value) -> {
-					System.out.print(key.getFlightData().getCallsign() + ": ");
-					value.forEach(x -> {
-						System.out.print(x.getReturnTime().toEpochMilli()/1000 + " ");
-					});
-					System.out.println();
-				});
+	public void run() {
+		for (int i = 0; i < 10; i++){
+			RadarTarget rt1 = new RadarTarget(
+				NxfRadar.RadarTarget.newBuilder()
+					.setReportedAltitude(10000)
+					.setBeaconCode(ByteString.fromHex("0480"))
+					.setReturnTime(i)
+					.build()
+			);
+			RadarTarget rt2 = new RadarTarget(
+				NxfRadar.RadarTarget.newBuilder()
+				.setReportedAltitude(12000)
+				.setBeaconCode(ByteString.fromHex("010481")) // should fail
+				.setReturnTime(i + 10)
+				.build()
+			);
+
+			manager.addTarget(rt1, "N1");
+			manager.addTarget(rt2, "N2");
+		}
+
+		System.out.println("Showing all RadarTarget->Track...");
+		manager.getTargetTrackMap().forEach((radarTarget, track) ->
+			System.out.println(radarTarget.getReturnTime().toEpochMilli()/1000 + ": " + track.getFlightData().getCallsign())
+		);
+
+		System.out.println("Showing all Track->List<RadarTarget>...");
+		ListMultimap<Track, RadarTarget> trackRadarTargetListMultimap = manager.getTrackRadarTargetMultiMap();
+		trackRadarTargetListMultimap.asMap().forEach((track, radarTargetList) -> {
+			System.out.print(track.getFlightData().getCallsign() + ": ");
+			for (RadarTarget radarTarget : radarTargetList) {
+				System.out.print(radarTarget.getReturnTime().toEpochMilli()/1000 + " ");
+			}
+			System.out.println();
+		});
+
+		System.out.println("Showing all String->Track...");
+		manager.getTrackByCallsignMap().forEach((s, track) ->
+			System.out.println(s + ": " + track.getFlightData().getCallsign())
+		);
 	}
 }

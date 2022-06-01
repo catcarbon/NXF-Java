@@ -27,20 +27,20 @@ public class Program {
 	}
 
 	public void run() {
-		for (int i = 0; i < 10; i++){
+		for (int i = 0; i < 10; i++) {
 			RadarTarget rt1 = new RadarTarget(
-				NxfRadar.RadarTarget.newBuilder()
-					.setReportedAltitude(10000)
-					.setBeaconCode(ByteString.fromHex("0480"))
-					.setReturnTime(i)
-					.build()
+					NxfRadar.RadarTarget.newBuilder()
+							.setReportedAltitude(10000)
+							.setBeaconCode(ByteString.fromHex("0480"))
+							.setReturnTime(i)
+							.build()
 			);
 			RadarTarget rt2 = new RadarTarget(
-				NxfRadar.RadarTarget.newBuilder()
-				.setReportedAltitude(12000)
-				.setBeaconCode(ByteString.fromHex("010481")) // should fail
-				.setReturnTime(i + 10)
-				.build()
+					NxfRadar.RadarTarget.newBuilder()
+							.setReportedAltitude(12000)
+							.setBeaconCode(ByteString.fromHex("010481")) // should fail
+							.setReturnTime(i + 10)
+							.build()
 			);
 
 			manager.addTarget(rt1, "N1");
@@ -48,23 +48,25 @@ public class Program {
 		}
 
 		System.out.println("Showing all RadarTarget->Track...");
-		manager.getTargetTrackMap().forEach((radarTarget, track) ->
-			System.out.println(radarTarget.getReturnTime().toEpochMilli()/1000 + ": " + track.getFlightData().getCallsign())
+		manager.getTargetTrackMap().forEach((radarTarget, track) -> {
+					System.out.println("radarTarget.getBeaconCode: " + radarTarget.getBeaconCode());
+					System.out.println(radarTarget.getReturnTime().toEpochMilli() / 1000 + ": " + track.getFlightData().getCallsign());
+				}
 		);
 
 		System.out.println("Showing all Track->List<RadarTarget>...");
-		ListMultimap<Track, RadarTarget> trackRadarTargetListMultimap = manager.getTrackRadarTargetMultiMap();
-		trackRadarTargetListMultimap.asMap().forEach((track, radarTargetList) -> {
+		ListMultimap<Track, RadarTarget> trackRadarTargetListMultiMap = manager.getTrackRadarTargetMultiMap();
+		trackRadarTargetListMultiMap.asMap().forEach((track, radarTargetList) -> {
 			System.out.print(track.getFlightData().getCallsign() + ": ");
 			for (RadarTarget radarTarget : radarTargetList) {
-				System.out.print(radarTarget.getReturnTime().toEpochMilli()/1000 + " ");
+				System.out.print(radarTarget.getReturnTime().toEpochMilli() / 1000 + " ");
 			}
 			System.out.println();
 		});
 
 		System.out.println("Showing all String->Track...");
 		manager.getTrackByCallsignMap().forEach((s, track) ->
-			System.out.println(s + ": " + track.getFlightData().getCallsign())
+				System.out.println(s + ": " + track.getFlightData().getCallsign())
 		);
 	}
 }

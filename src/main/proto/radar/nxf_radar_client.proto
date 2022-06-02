@@ -6,32 +6,19 @@ import "radar/nxf_radar.proto";
 package io.wtmsb.nxf.message.radar;
 
 message ClientRadarEvent {
-  oneof event_specific {
-    // Nested message edits
-    // Track
-    EditFlightStrip edit_flight_strip = 11;
-    EditInitiateHandoff edit_initiate_handoff = 12;
-    EditAcceptHandoff edit_accept_handoff = 13;
-    EditDataBlockSupplement edit_data_block_supplement = 14;
+  oneof event {
+    EditInitiateHandoff edit_initiate_handoff = 11;
+    EditAcceptHandoff edit_accept_handoff = 12;
   }
 }
 
-message EditFlightStrip {
-  uint32 track_id = 1;
-  FlightStrip new_flight_strip = 2;
-}
-
 message EditInitiateHandoff {
-  uint32 track_id = 1;
-  Track.ControllingUnit next_controller = 2;
+  FlightData.Key key = 1;
+  ControllingUnit next_controller = 2;
+  optional ControllingUnit current_controller = 3;
 }
 
 message EditAcceptHandoff {
-  uint32 track_id = 1;
-  optional Track.ControllingUnit current_controller = 2;
-}
-
-message EditDataBlockSupplement {
-  uint32 track_id = 1;
-  Track.DataBlockSupplement data_block_supplement = 2;
+  FlightData.Key key = 1;
+  optional ControllingUnit current_controller = 2;
 }

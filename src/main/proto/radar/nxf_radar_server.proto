@@ -6,43 +6,37 @@ import "radar/nxf_radar.proto";
 package io.wtmsb.nxf.message.radar;
 
 message ServerRadarEvent {
-  oneof event_specific {
+  oneof event {
     // New message pushes
-    Track push_new_track = 1;
-    FlightStrip push_new_flight_strip = 2;
+    PushRadarTarget push_radar_target = 1;
+    FlightData push_flight_data = 2;
 
-    // Nested message pushes
-    // Track
-    PushRadarTarget push_radar_target = 11;
-    PushFlightStrip push_flight_strip = 12;
-    PushInitiateHandoff push_initiate_handoff = 13;
-    PushAcceptHandoff push_accept_handoff = 14;
-    PushDataBlockSupplement push_data_block_supplement = 15;
+    // ControllingUnit pushes
+    PushInitiateHandoff push_initiate_handoff = 11;
+    PushAcceptHandoff push_accept_handoff = 12;
+
+    // FlightDataSupplement push
+    PushFlightDataSupplement push_flight_data_supplement = 21;
   }
 }
 
 message PushRadarTarget {
-  uint32 track_id = 1;
-  Track.RadarTarget new_target = 2;
-}
-
-message PushFlightStrip {
-  uint32 track_id = 1;
-  FlightStrip flight_strip = 2;
+  optional FlightData.Key correlated_flight_data = 1;
+  RadarTarget new_target = 2;
 }
 
 message PushInitiateHandoff {
-  uint32 track_id = 1;
-  Track.ControllingUnit next_controller = 2;
-  optional Track.ControllingUnit current_controller = 3;
+  FlightData.Key key = 1;
+  ControllingUnit next_controller = 2;
+  optional ControllingUnit current_controller = 3;
 }
 
 message PushAcceptHandoff {
-  uint32 track_id = 1;
-  optional Track.ControllingUnit current_controller = 2;
+  FlightData.Key key = 1;
+  optional ControllingUnit current_controller = 3;
 }
 
-message PushDataBlockSupplement {
-  uint32 track_id = 1;
-  Track.DataBlockSupplement data_block_supplement = 2;
+message PushFlightDataSupplement {
+  FlightData.Key key = 1;
+  FlightDataSupplement flight_data_supplement = 2;
 }

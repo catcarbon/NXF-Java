@@ -1,10 +1,10 @@
 package io.wtmsb.nxf.domain;
 
 import io.wtmsb.nxf.message.radar.NxfRadar;
+import io.wtmsb.nxf.validation.RouteString;
 import lombok.*;
 
 import javax.validation.constraints.Max;
-import javax.validation.constraints.Size;
 
 import static io.wtmsb.nxf.domain.IRadarComponent.*;
 
@@ -18,16 +18,16 @@ public final class FlightDataSupplement {
 	@NonNull @Max(MAX_ALTITUDE)
 	private Integer assignedFinalAltitude;
 
-	@NonNull @Size(max = 5)
+	@NonNull @RouteString(maxLength = 5)
 	private String pad1;
 
-	@NonNull @Size(max = 5)
+	@NonNull @RouteString(maxLength = 5)
 	private String pad2;
 
-	@NonNull @Size(max = 3)
+	@NonNull @RouteString(maxLength = 3)
 	private String runway;
 
-	@NonNull @Size(max = 5)
+	@NonNull @RouteString(maxLength = 5)
 	private String exitFix;
 
 	@NonNull

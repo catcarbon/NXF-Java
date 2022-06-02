@@ -3,13 +3,12 @@ package io.wtmsb.nxf.domain;
 import com.google.protobuf.ByteString;
 import io.wtmsb.nxf.manager.ControllerManager;
 import io.wtmsb.nxf.message.radar.NxfRadar;
-import io.wtmsb.nxf.validation.BeaconCode;
-import io.wtmsb.nxf.validation.IcaoAddress;
+import io.wtmsb.nxf.validation.*;
 import lombok.*;
 import org.springframework.util.StringUtils;
 
 import javax.validation.constraints.Max;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.PastOrPresent;
 import java.time.Instant;
 
 /**
@@ -18,7 +17,7 @@ import java.time.Instant;
 @Getter @Setter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class FlightData implements IRadarComponent {
-	@NonNull @Size(min = 2, max = 10)
+	@Callsign
 	@EqualsAndHashCode.Include
 	private String callsign;
 
@@ -36,29 +35,29 @@ public class FlightData implements IRadarComponent {
 	@EqualsAndHashCode.Include
 	private ByteString assignedBeaconCode = DEFAULT_BEACON_CODE;
 
-	@NonNull
+	@NonNull @PastOrPresent
 	@EqualsAndHashCode.Include
 	private Instant lastUpdated = Instant.now();
 
-	@NonNull @Size(max = 4)
+	@AlphanumericString(maxLength = 4)
 	private String aircraftType = "";
 
-	@NonNull @Size(max = 1)
+	@AlphanumericString(maxLength = 1)
 	private String equipmentSuffix = "";
 
 	@NonNull
 	private FlightRule flightRule = FlightRule.INSTRUMENT;
 
-	@NonNull @Size(max = 4)
+	@AlphanumericString(maxLength = 4)
 	private String departurePoint = "";
 
-	@NonNull @Size(max = 4)
+	@AlphanumericString(maxLength = 4)
 	private String destination = "";
 
 	@NonNull @Max(MAX_ALTITUDE)
 	private Integer requestedAltitude = 0;
 
-	@NonNull @Size(max = 2000)
+	@RouteString(maxLength = 2000)
 	private String routeString = "";
 
 	@NonNull
@@ -76,12 +75,8 @@ public class FlightData implements IRadarComponent {
 	@NonNull
 	private FlightDataSupplement supplement = FlightDataSupplement.getDefault();
 
-	public FlightData(@NonNull String _callsign) {
-		if (!StringUtils.hasText(_callsign)) {
-			throw new IllegalArgumentException("Invalid callsign in FlightData message");
-		}
-		// TODO: use {@link org.apache.commons.lang3.StringUtils}
-		callsign = StringUtils.trimWhitespace(_callsign);
+	public FlightData(@Callsign String _callsign) {
+		callsign = _callsign;
 	}
 
 	public FlightData(NxfRadar.FlightData fDataMessage) {

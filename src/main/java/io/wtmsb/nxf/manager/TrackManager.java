@@ -5,6 +5,7 @@ import com.google.common.collect.ListMultimap;
 import io.wtmsb.nxf.domain.RadarTarget;
 import io.wtmsb.nxf.domain.Track;
 import io.wtmsb.nxf.utility.GeoCalculator;
+import io.wtmsb.nxf.validation.Callsign;
 import lombok.NonNull;
 import lombok.Synchronized;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +57,7 @@ public class TrackManager {
 		return trackByCallsignMap;
 	}
 
-	public void addTarget(RadarTarget target, @NonNull String callsign) {
+	public void addTarget(RadarTarget target, @Callsign String callsign) {
 		if (callsign.length() == 0) {
 			addTargetAndAutoCorrelate(target);
 		} else {
@@ -87,7 +88,7 @@ public class TrackManager {
 	 * @param callsignHint hint from Nxf data source
 	 */
 	@Synchronized
-	private void addCorrelatedTarget(RadarTarget target, String callsignHint) {
+	private void addCorrelatedTarget(RadarTarget target, @Callsign String callsignHint) {
 		Track correlatedTrack = trackByCallsignMap.computeIfAbsent(callsignHint, Track::new);
 		trackTargetMultiMap.put(correlatedTrack, target);
 		targetTrackMap.put(target, correlatedTrack);

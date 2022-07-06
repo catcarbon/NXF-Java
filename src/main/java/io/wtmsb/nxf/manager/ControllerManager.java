@@ -6,16 +6,16 @@ import io.wtmsb.nxf.domain.ControllingUnit;
 import io.wtmsb.nxf.message.radar.NxfRadar;
 import lombok.NonNull;
 import lombok.Synchronized;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 @Service
 public final class ControllerManager {
-	private static final ControllingUnit uncontrolledUnit =
-			new ControllingUnit(NxfRadar.ControllingUnit.getDefaultInstance());
-	private static final Table<String, String, ControllingUnit> cache = HashBasedTable.create();
+	private static final ControllingUnit uncontrolledUnit;
+	private static final Table<String, String, ControllingUnit> cache;
 
 	static {
+		uncontrolledUnit = new ControllingUnit(NxfRadar.ControllingUnit.getDefaultInstance());
+		cache = HashBasedTable.create();
 		cache.put(uncontrolledUnit.getFacility(), uncontrolledUnit.getSector(), uncontrolledUnit);
 	}
 

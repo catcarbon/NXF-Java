@@ -6,7 +6,6 @@ import io.wtmsb.nxf.domain.RadarTarget;
 import io.wtmsb.nxf.domain.Track;
 import io.wtmsb.nxf.utility.GeoCalculator;
 import io.wtmsb.nxf.validation.Callsign;
-import lombok.NonNull;
 import lombok.Synchronized;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

@@ -16,6 +16,7 @@ import java.time.Instant;
 public final class RadarTarget implements IRadarComponent {
 	@Min(-90) @Max(90)
 	private final double lat;
+
 	@Min(-180) @Max(180)
 	private final double lon;
 

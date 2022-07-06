@@ -7,7 +7,7 @@ import javax.validation.ConstraintValidatorContext;
 import java.util.regex.Pattern;
 
 public class AlphanumericStringValidator implements ConstraintValidator<AlphanumericString, String> {
-	private static final Pattern illegalCharacterPattern = Pattern.compile("[^A-Za-z]");
+	private static final Pattern illegalCharacterPattern = Pattern.compile("[^A-Za-z\\d]");
 
 	private int minLength, maxLength;
 
